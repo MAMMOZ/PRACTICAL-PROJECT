@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#2d1a64] font-sans">
+    <!-- Navbar -->
+    <div class="flex justify-between p-4 bg-[#3a287a]">
+        <div class="py-5 px-4"></div> <!-- Placeholder for left content if needed -->
+    </div>
+
+    <!-- Welcome Section -->
+    <div class="max-w-4xl mx-auto my-8 text-white px-4">
+        <div class="bg-gradient-to-r from-blue-600 to-purple-800 p-10 rounded-lg flex flex-col sm:flex-row justify-between items-center">
+            <div class="text-lg">Welcome</div>
+            <div class="text-4xl font-bold">MAMMOZ</div>
+            <div class="flex space-x-4 mt-4 sm:mt-0">
+                <div class="text-green-400" id="online">BOT : 0</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="flex justify-center space-x-8 text-white px-4 py-2">
+        <div class="bg-[#463187] p-4 rounded-lg text-center grid grid-cols-2 flex flex-col sm:flex-row justify-between items-center">
+            <div>
+                <img src="https://raw.githubusercontent.com/MAMMOZ/AD-Auto-trade/main/img/gem.webp" alt="Gem" class="mx-auto w-16">
+            </div>
+            <div>
+                <div class="sm:text-2xl font-bold" id="gembot">599</div>
+            </div>
+        </div>
+        <div class="bg-[#463187] p-4 rounded-lg text-center grid grid-cols-2 flex flex-col sm:flex-row justify-between items-center">
+            <div>
+                <img src="https://static.wikia.nocookie.net/animedefenders/images/9/99/Goldcoin.png/revision/latest?cb=20240713055846" alt="Crystal" class="mx-auto w-16">
+            </div>
+            <div>
+                <div class="sm:text-2xl font-bold" id="goldbot">599</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bot Table Section -->
+    <div class="max-w-4xl mx-auto my-8 text-white px-4">
+        <div class="bg-[#3a287a] p-6 rounded-lg">
+            <div class="grid grid-cols-3 sm:grid-cols-3 text-center gap-4" id="botTable">
+                <!-- Table Header -->
+                <div class="font-bold">GEM</div>
+                <div class="font-bold">Gold</div>
+                <!-- Data will be injected here dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript to fetch data and render -->
+    <script>
+        async function fetchBotData() {
+            try {
+                // Fetch the bot data from your backend endpoint
+                const response = await fetch('http://127.0.0.1:8000/getlog', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                    },
+                });
+                const data = await response.json();
+                console.log(data);
+
+
+                const gembot = document.getElementById('gembot');
+                gembot.innerHTML = data.total_gem ? data.total_gem : "0"
+                const goldbot = document.getElementById('goldbot');
+                goldbot.innerHTML = data.total_gold ? data.total_gold : "0"
+
+                const online = document.getElementById('online');
+                online.innerHTML = "BOT : "+data.data.length
+
+                // Check if we received valid data
+                if (Array.isArray(data.data)) {
+                    const botTable = document.getElementById('botTable');
+
+                    botTable.innerHTML = '';
+                    
+                    data.data.forEach((bot, index) => {
+                        if (index >= 50) {
+                            return; // Exit the loop
+                        }
+                        botTable.innerHTML += `
+                            <div class="flex flex-col items-center">
+                                <img src="https://raw.githubusercontent.com/MAMMOZ/AD-Auto-trade/main/img/bot-avatar.webp" alt="Bot" class="w-16 h-16 rounded-full">
+                            </div>
+                            <div class="sm:grid grid-cols-2 bg-blue-700 rounded-lg flex flex-col sm:flex-row justify-between items-center">
+                                <div>
+                                    <img src="https://raw.githubusercontent.com/MAMMOZ/AD-Auto-trade/main/img/gem.webp" alt="Gem" class="w-10 mx-auto">
+                                </div>
+                                <div>
+                                    <div class="text-sm lg:text-base font-bold text-justify">${bot.gem}</div>
+                                </div>
+                            </div>
+                            <div class="sm:grid grid-cols-2 bg-purple-700 rounded-lg flex flex-col sm:flex-row justify-between items-center">
+                                <div>
+                                    <img src="https://static.wikia.nocookie.net/animedefenders/images/9/99/Goldcoin.png/revision/latest?cb=20240713055846" alt="Crystal" class="w-8 mx-auto">
+                                </div>
+                                <div>
+                                    <div class="text-sm lg:text-base font-bold text-justify">${bot.gold}</div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    console.error('Invalid data received:', data);
+                }
+            } catch (error) {
+                console.error('Error fetching bot data:', error);
+            }
+        }
+
+        // Call the function to fetch data when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchBotData(); // เรียกฟังก์ชันครั้งแรกเมื่อโหลดหน้าเว็บ
+            setInterval(fetchBotData, 20000); // เรียกฟังก์ชันซ้ำทุกๆ 20 วินาที
+        });
+
+    </script>
+</body>
+</html>
