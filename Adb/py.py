@@ -46,22 +46,23 @@ class ADeAuto():
         os.system(f'adb -s {self.emulator} exec-out screencap -p > {name}.png')
 
         img = Image.open(f'{name}.png')
-
-        # crop_area = (367, 422, 601, 444)
         crop_area = (367, 444, 601, 466)
-
         cropped_img = img.crop(crop_area)
-
         cropped_img.save(f'{name}_cropped.png')
-        print(f'{name}cap')
+        print(f'{name} cap')
 
         with open(f'{name}_cropped.png', 'rb') as img_file:
             files = {'file': (f'{name}_cropped.png', img_file, 'image/png')}
-            response = requests.post("http://127.0.0.1:8000/detectImage", files=files)
+            data = {"id": int(name)}  # Create dictionary with only the id
+            
+            # Send the POST request with id in JSON and image as file
+            response = requests.post("http://127.0.0.1:8000/detectImage", data=data, files=files)
 
         print(f'API response: {response.status_code}, {response.text}')
-
         return response.text
+
+
+
 
 
     def click(self, x, y):
