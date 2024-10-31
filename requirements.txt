@@ -1,6 +1,7 @@
 # Run Yolov5 requirements
 fastapi
 uvicorn
+python-multipart
 
 # Adb requirements
 colorlog
